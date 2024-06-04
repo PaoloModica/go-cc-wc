@@ -9,7 +9,7 @@ import (
 func main() {
 	option := os.Args[1]
 	file := os.Args[2]
-	wordCounter := wordcounter.WordCounterFunc(wordcounter.FileBytesCount)
+	wordCounter := wordcounter.WordCounterFunc(wordcounter.WordCount)
 
 	// feed the word counter with the request args
 	res, _ := wordCounter.CountWords(file, option)

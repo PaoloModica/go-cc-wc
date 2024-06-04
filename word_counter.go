@@ -1,6 +1,7 @@
 package wordcounter
 
 import (
+	"bufio"
 	"errors"
 	"os"
 )
@@ -18,15 +19,38 @@ func (wc WordCounterFunc) CountWords(filePath string, option string) (int, error
 	return wc(filePath, option)
 }
 
-func FileBytesCount(filePath string, option string) (int, error) {
+func WordCount(filePath string, option string) (int, error) {
+	// open the file
+	file, err := os.Open(filePath)
+
+	if err != nil {
+		return 0, errors.New(FileNotFoundErrorMessage)
+	}
+
+	defer file.Close()
+
+	var split bufio.SplitFunc
+
 	switch option {
 	case "-c":
-		b, err := os.ReadFile(filePath)
-		if err != nil {
-			return 0, errors.New(FileNotFoundErrorMessage)
-		}
-		return len(b), nil
+		split = bufio.ScanBytes
+	case "-l":
+		split = bufio.ScanLines
+	case "-w":
+		split = bufio.ScanWords
+	case "-m":
+		split = bufio.ScanRunes
 	default:
 		return 0, errors.New(InvalidOptionErrorMessage)
 	}
+
+	scanner := bufio.NewScanner(file)
+	scanner.Split(split)
+
+	counter := 0
+	for scanner.Scan() {
+		counter++
+	}
+
+	return counter, nil
 }

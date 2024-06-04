@@ -1,16 +1,23 @@
 package wordcounter_test
 
 import (
+	"fmt"
 	wordcounter "go-cc-wc"
 	"testing"
 )
 
 func TestWC(t *testing.T) {
-	var wordCounter = wordcounter.WordCounterFunc(wordcounter.FileBytesCount)
+	var wordCounter = wordcounter.WordCounterFunc(wordcounter.WordCount)
+
+	type wcTestCase struct {
+		id             string
+		option         string
+		expectedResult int
+	}
 
 	t.Run("raise an error for invalid option", func(t *testing.T) {
 		file := "test.txt"
-		option := "-w"
+		option := "-y"
 
 		_, err := wordCounter.CountWords(file, option)
 
@@ -29,19 +36,44 @@ func TestWC(t *testing.T) {
 		}
 	})
 	t.Run("return bytes read from file", func(t *testing.T) {
-		file := "test.txt"
-		option := "-c"
-
-		expectedN := 335043
-
-		n, err := wordCounter.CountWords(file, option)
-
-		if err != nil {
-			t.Fatalf("could not read the content of %s, error: %v", file, err)
+		wcTestCases := []wcTestCase{
+			{
+				"-c option returns number of bytes in file",
+				"-c",
+				335043,
+			},
+			{
+				"-l option returns number of lines in file",
+				"-l",
+				7146,
+			},
+			{
+				"-w option returns number of words in file",
+				"-w",
+				58164,
+			},
+			{
+				"-m option returns number of characters in file",
+				"-m",
+				332147,
+			},
 		}
 
-		if n != expectedN {
-			t.Errorf("expected %d bytes read, got %d", expectedN, n)
+		file := "test.txt"
+
+		for _, testCase := range wcTestCases {
+			t.Run(fmt.Sprintf("wc with %s", testCase.id), func(t *testing.T) {
+				gotResult, err := wordCounter.CountWords(file, testCase.option)
+
+				if err != nil {
+					t.Fatalf("could not read the content of %s, error: %v", file, err)
+				}
+
+				if gotResult != testCase.expectedResult {
+					t.Errorf("expected %d, got %d with option %s", testCase.expectedResult, gotResult, testCase.option)
+				}
+
+			})
 		}
 	})
 }
