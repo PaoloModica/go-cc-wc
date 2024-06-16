@@ -3,6 +3,7 @@ package wordcounter_test
 import (
 	"fmt"
 	wordcounter "go-cc-wc"
+	"reflect"
 	"testing"
 )
 
@@ -12,7 +13,7 @@ func TestWC(t *testing.T) {
 	type wcTestCase struct {
 		id             string
 		option         string
-		expectedResult int
+		expectedResult []int
 	}
 
 	t.Run("raise an error for invalid option", func(t *testing.T) {
@@ -40,22 +41,27 @@ func TestWC(t *testing.T) {
 			{
 				"-c option returns number of bytes in file",
 				"-c",
-				335043,
+				[]int{335043},
 			},
 			{
 				"-l option returns number of lines in file",
 				"-l",
-				7146,
+				[]int{7146},
 			},
 			{
 				"-w option returns number of words in file",
 				"-w",
-				58164,
+				[]int{58164},
 			},
 			{
 				"-m option returns number of characters in file",
 				"-m",
-				332147,
+				[]int{332147},
+			},
+			{
+				"no option returns the number provided by -l, -w and -c option",
+				"",
+				[]int{7146, 58164, 335043},
 			},
 		}
 
@@ -69,8 +75,8 @@ func TestWC(t *testing.T) {
 					t.Fatalf("could not read the content of %s, error: %v", file, err)
 				}
 
-				if gotResult != testCase.expectedResult {
-					t.Errorf("expected %d, got %d with option %s", testCase.expectedResult, gotResult, testCase.option)
+				if !reflect.DeepEqual(gotResult, testCase.expectedResult) {
+					t.Errorf("expected %v, got %v with option %s", testCase.expectedResult, gotResult, testCase.option)
 				}
 
 			})

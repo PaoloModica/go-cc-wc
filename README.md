@@ -1,8 +1,29 @@
 # Go `wc` tool
 
-## Overview
+## Overview 
 
 This project aims at building Unix `wc` tool using `Go`.
+
+## Usage
+
+### Build
+
+```bash
+go build -o ccwc cmd/cli/main.go
+```
+
+### Run
+
+```bash
+./ccwc [option] [file]
+```
+
+Example
+
+```bash
+$ ./ccwc -l test.txt
+[7146] test.txt
+```
 
 ## Acknowledgement
 
